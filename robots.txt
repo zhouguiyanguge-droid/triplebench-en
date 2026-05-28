@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://triplebench.com/sitemap.xml
