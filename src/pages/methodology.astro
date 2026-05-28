@@ -4,24 +4,106 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
 <BaseLayout
   title="Methodology - TripleBench"
-  description="How TripleBench runs AI tool comparisons."
+  description="How TripleBench picks tasks, runs each agent, scores results, and publishes raw evidence. The rubric, the rules, and what we deliberately leave out."
 >
   <main class="article">
-    <p class="eyebrow">Methodology</p>
+    <p class="eyebrow">Methodology · v1 · 2026-05-29</p>
     <h1>Same task, three tools, one acceptance gate</h1>
-    <p>
-      TripleBench compares tools by giving each one the same concrete task and measuring what happened: implementation quality, evidence quality, continuity, and cost clarity.
+    <p class="lede">
+      TripleBench compares Codex, Claude Code, and Gemini CLI by giving each one the same concrete task and measuring what happened. This page is the rulebook. If something we publish later contradicts it, the page wins, not the post — open an issue.
     </p>
-    <h2>Run format</h2>
+
+    <h2>1. How we pick tasks</h2>
+    <p>A task qualifies for the bench only if all four of these are true.</p>
+    <ul>
+      <li><strong>It's real.</strong> Pulled from a public open-source repository: a real issue, a real PR review request, a real refactor. No synthetic toy problems. No LeetCode-style puzzles the agents almost certainly saw during training.</li>
+      <li><strong>It's reproducible.</strong> The starting commit is pinned. The repo is public. Anyone can clone it and re-run the agent against the same baseline.</li>
+      <li><strong>It has an objective success gate.</strong> Either a test suite the agents never saw passes after their changes, or a documented manual check (such as "the build is green and the previously failing case now passes") can verify the result.</li>
+      <li><strong>It's representative.</strong> The task should look like work some real engineer somewhere is doing this week — a refactor, a bug fix, a feature wiring, a migration. Not a contrived showcase.</li>
+    </ul>
+
+    <h2>2. How we run each agent</h2>
     <ol>
-      <li>Define a task with a clear output artifact and acceptance criteria.</li>
-      <li>Run the task in Codex, Claude Code, and Gemini CLI under the same constraints.</li>
-      <li>Record commands, blockers, manual steps, and verification results.</li>
-      <li>Score each tool using the published rubric and keep raw notes for paid appendices.</li>
+      <li>Pin the agent version. We record the exact CLI version or release tag of Codex, Claude Code, and Gemini CLI at the moment of each run.</li>
+      <li>Reset the working directory to the pinned baseline commit. No leftover state from a prior run.</li>
+      <li>Paste the same prompt. Word for word. No per-tool re-phrasing to make one happier.</li>
+      <li>Let the agent work. We do not intervene to "rescue" a stuck run. We do not provide additional context unless the agent explicitly asks for it.</li>
+      <li>Stop conditions: the agent declares done, the agent gets stuck and asks a question we won't answer mid-run, or the run hits a 60-minute wall-clock cap.</li>
+      <li>Save the full transcript, the final diff, and the elapsed time. Run the acceptance gate. Record pass / fail.</li>
     </ol>
-    <h2>Disclosure</h2>
+
+    <h2>3. What we score</h2>
+    <p>Each run produces a row in our benchmark table. The columns are:</p>
+    <table class="metric-table">
+      <thead>
+        <tr><th>Column</th><th>What it measures</th><th>How we score it</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Coding execution</td>
+          <td>Did the agent correctly modify the code and verify its own changes?</td>
+          <td>Pass/fail on the held-out gate, with a partial-credit note if the change is close but fails one specific check.</td>
+        </tr>
+        <tr>
+          <td>Research quality</td>
+          <td>If the task required understanding context (issue threads, docs, related code), did the agent find and use the right material?</td>
+          <td>Editorial 0-100 grade against an explicit checklist published per task. We show the checklist.</td>
+        </tr>
+        <tr>
+          <td>Workflow continuity</td>
+          <td>Did the agent preserve state, recover from blockers, and hand off cleanly if interrupted?</td>
+          <td>Editorial grade based on the transcript: did it summarize where it was, did it leave the repo in a working state, did it explain blockers.</td>
+        </tr>
+        <tr>
+          <td>Cost clarity</td>
+          <td>Can an operator predict the dollar or token cost of the next run from this run's signal?</td>
+          <td>Recorded as "transparent / partial / opaque." Transparent means the tool reported tokens or session minutes during the run.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>4. The "best for" line</h2>
     <p>
-      Ada is a virtual editor. TripleBench uses AI assistance to run and summarize tests, but the site should preserve raw prompts, tool outputs, and verification notes so readers can judge the result.
+      Every tool gets a one-sentence "best for" verdict. This is editorial, not a metric. It captures the gestalt of how the tool felt during the run, not just whether it passed the gate. We will be wrong sometimes; we will revise these as more runs accumulate.
+    </p>
+
+    <h2>5. What we publish per task</h2>
+    <ul>
+      <li>The exact prompt.</li>
+      <li>The pinned commit hash and the link to the public repo.</li>
+      <li>Each agent's version pin.</li>
+      <li>Full session transcripts (or links to them, when long).</li>
+      <li>The acceptance gate, including the test suite if one was used.</li>
+      <li>The diff each agent produced.</li>
+      <li>Elapsed time and any reported cost signal.</li>
+      <li>The score for each rubric column.</li>
+      <li>A short editorial verdict and a "best for" line per agent.</li>
+    </ul>
+
+    <h2>6. What we do not publish</h2>
+    <ul>
+      <li>We don't redact failed runs. Failures are published with the same level of detail as successes.</li>
+      <li>We don't fold in "qualitative impressions" that aren't anchored in a specific transcript moment.</li>
+      <li>We don't average across unrelated tasks to produce a single overall ranking. We report each task on its own.</li>
+    </ul>
+
+    <h2>7. Conflicts of interest</h2>
+    <p>
+      We pay retail for all three subscriptions out of pocket. We do not accept free credit, free seats, or pre-publication review from any of the vendors we benchmark. If that ever changes, we'll disclose it on this page before publishing the affected report. The site is monetized through small digital downloads (raw prompts, CSV exports, operator notes) and, possibly, future paid subscriptions — never through affiliate links to the tools we test.
+    </p>
+
+    <h2>8. Why we tell you Ada is an AI</h2>
+    <p>
+      Ada is an AI editor. A human runs the actual benchmarks, reviews every published score, and signs off before anything goes live. We say so openly because we think the alternative — pretending an AI-curated site is human-written — degrades the open web. AI is good at organizing benchmark data; it is bad at deciding which benchmark is worth running. The human-in-the-loop part is the part that makes this site worth reading.
+    </p>
+
+    <h2>9. Versioning this methodology</h2>
+    <p>
+      This page is methodology <strong>v1</strong>. When we change the rubric, the weights, or the publication rules, we'll cut a new version, archive the old one, and note in each report which version of the methodology it was scored under. Old scores will not be silently re-graded.
+    </p>
+
+    <p style="margin-top:2.5rem;color:var(--muted, #71717a);font-size:0.95em">
+      Last updated: 2026-05-29 · Open an <a href="https://github.com/zhouguiyanguge-droid/triplebench-en/issues">issue</a> if you disagree with any of this.
     </p>
   </main>
 </BaseLayout>
