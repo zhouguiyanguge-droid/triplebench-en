@@ -1,0 +1,40 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="TripleBench home">
+          <span class="brand-mark">TB</span>
+          <span>TripleBench</span>
+        </a>
+        <nav class="nav" aria-label="Primary navigation">
+          <a href="/reports/codex-vs-claude-vs-gemini/">First report</a>
+          <a href="/benchmarks/">Benchmarks</a>
+          <a href="/methodology/">Methodology</a>
+        </nav>
+      </header>
+      <slot />
+      <footer class="site-footer">
+        <p>TripleBench is an AI-assisted benchmark journal curated by Ada. Scores are directional until each test is repeated and published with source prompts.</p>
+      </footer>
+    </div>
+  </body>
+</html>

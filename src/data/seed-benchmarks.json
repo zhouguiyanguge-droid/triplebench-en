@@ -1,0 +1,26 @@
+[
+  {
+    "tool": "Codex",
+    "coding": 88,
+    "research": 72,
+    "workflow": 82,
+    "costClarity": 70,
+    "bestFor": "repo-scale implementation and verified local changes"
+  },
+  {
+    "tool": "Claude Code",
+    "coding": 84,
+    "research": 76,
+    "workflow": 86,
+    "costClarity": 68,
+    "bestFor": "long-form agentic coding sessions and planning continuity"
+  },
+  {
+    "tool": "Gemini CLI",
+    "coding": 74,
+    "research": 82,
+    "workflow": 70,
+    "costClarity": 78,
+    "bestFor": "fast research-heavy tasks and broad context exploration"
+  }
+]

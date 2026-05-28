@@ -1,0 +1,43 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import benchmarks from "../data/seed-benchmarks.json";
+---
+
+<BaseLayout
+  title="Benchmark table - TripleBench"
+  description="Seed benchmark scores for the first TripleBench comparison set."
+>
+  <main class="article">
+    <p class="eyebrow">Benchmark table</p>
+    <h1>Seed scores before the first repeated run</h1>
+    <p>
+      This table is intentionally marked as a seed dataset. It is useful for launch layout and scoring calibration, but it should not be treated as a final buyer recommendation until the live runs are repeated and linked.
+    </p>
+    <table class="metric-table">
+      <thead>
+        <tr>
+          <th>Tool</th>
+          <th>Coding</th>
+          <th>Research</th>
+          <th>Workflow</th>
+          <th>Cost clarity</th>
+          <th>Best fit</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          benchmarks.map((item) => (
+            <tr>
+              <td>{item.tool}</td>
+              <td>{item.coding}</td>
+              <td>{item.research}</td>
+              <td>{item.workflow}</td>
+              <td>{item.costClarity}</td>
+              <td>{item.bestFor}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </main>
+</BaseLayout>

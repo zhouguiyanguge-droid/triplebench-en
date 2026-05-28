@@ -1,0 +1,42 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Codex vs Claude Code vs Gemini CLI - TripleBench"
+  description="A launch report scaffold comparing Codex, Claude Code, and Gemini CLI for practical AI work."
+>
+  <main class="article">
+    <p class="eyebrow">Launch report scaffold</p>
+    <h1>Codex vs Claude Code vs Gemini CLI: which AI work tool should operators test first?</h1>
+    <p>
+      This first TripleBench report starts with a practical question: if an operator wants to turn an idea into a live artifact, which AI tool gives the clearest path from instruction to verified output?
+    </p>
+    <p>
+      The current version is a launch scaffold. It defines the structure, score table, and acceptance standard. The final version should replace seed scores with repeated live runs and link to raw prompts.
+    </p>
+
+    <h2>Short answer</h2>
+    <p>
+      Codex is the strongest first test when the work happens inside a local repository and the output must be verified. Claude Code is strong for long agentic sessions and handoff continuity. Gemini CLI is worth testing for research-heavy tasks where broad context and speed matter more than local implementation polish.
+    </p>
+
+    <h2>Test task</h2>
+    <p>
+      Build and ship a small static benchmark site from an empty repository, preserve state in a project file, and leave a handoff prompt for the next agent.
+    </p>
+
+    <h2>What to verify before publishing final scores</h2>
+    <ul>
+      <li>Each tool runs the same repository setup task from a clean checkout.</li>
+      <li>The site builds locally without warnings that affect output.</li>
+      <li>The generated handoff file lets another agent continue without reading the chat transcript.</li>
+      <li>Any required human login, payment, or 2FA step is separated from automated progress.</li>
+    </ul>
+
+    <h2>Commercial angle</h2>
+    <p>
+      The paid product can package the raw prompt set, benchmark CSV, scoring spreadsheet, and operator notes. The free article should answer the search intent; the paid bundle should save readers time if they want to repeat the test.
+    </p>
+  </main>
+</BaseLayout>

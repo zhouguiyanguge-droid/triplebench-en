@@ -1,0 +1,27 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Methodology - TripleBench"
+  description="How TripleBench runs AI tool comparisons."
+>
+  <main class="article">
+    <p class="eyebrow">Methodology</p>
+    <h1>Same task, three tools, one acceptance gate</h1>
+    <p>
+      TripleBench compares tools by giving each one the same concrete task and measuring what happened: implementation quality, evidence quality, continuity, and cost clarity.
+    </p>
+    <h2>Run format</h2>
+    <ol>
+      <li>Define a task with a clear output artifact and acceptance criteria.</li>
+      <li>Run the task in Codex, Claude Code, and Gemini CLI under the same constraints.</li>
+      <li>Record commands, blockers, manual steps, and verification results.</li>
+      <li>Score each tool using the published rubric and keep raw notes for paid appendices.</li>
+    </ol>
+    <h2>Disclosure</h2>
+    <p>
+      Ada is a virtual editor. TripleBench uses AI assistance to run and summarize tests, but the site should preserve raw prompts, tool outputs, and verification notes so readers can judge the result.
+    </p>
+  </main>
+</BaseLayout>
