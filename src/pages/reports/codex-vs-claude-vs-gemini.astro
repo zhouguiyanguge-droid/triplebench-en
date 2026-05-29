@@ -1,42 +1,184 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const tools = [
+  {
+    name: "Codex",
+    tag: "codex-cli 0.128.0 · gpt-5.5 high",
+    accent: "#ea580c",
+    time: "1m48s",
+    gate: "PASS",
+    cost: "Transparent",
+    costNote: "printed token usage on exit (total 57,638)",
+    scores: { Coding: 96, Research: 85, Workflow: 85, "Cost clarity": 90 },
+    line: "Verified local fixes with a transparent cost signal.",
+  },
+  {
+    name: "Claude Code",
+    tag: "2.1.101 · Opus 4.6",
+    accent: "#6d28d9",
+    time: "1m13s",
+    gate: "PASS",
+    cost: "Opaque",
+    costNote: "Max subscription — no tokens or $ reported",
+    scores: { Coding: 92, Research: 80, Workflow: 90, "Cost clarity": 50 },
+    line: "The leanest, most idiomatic patch — it matched the maintainers' own fix.",
+  },
+  {
+    name: "Gemini CLI",
+    tag: "0.44.1 · Auto (Code Assist)",
+    accent: "#2563eb",
+    time: "slowest",
+    gate: "PASS",
+    cost: "Partial",
+    costNote: "showed a quota % only (3% used)",
+    scores: { Coding: 95, Research: 95, Workflow: 92, "Cost clarity": 65 },
+    line: "The deepest read of a bug, if you can spare the speed.",
+  },
+];
+const prompt = `You are working in a local clone of the python-pendulum/pendulum repository, already checked out at a specific commit. Do not change the checked-out commit and do not pull or upgrade anything. Bug report: pendulum's pure-Python ISO 8601 parser accepts the string "P" as a valid duration and returns an empty Duration(). Per ISO 8601, a duration must contain at least one element, so "P" is not a valid duration and should be rejected by raising a ValueError — matching the behavior of pendulum's Rust parser. All other inputs must keep working unchanged: valid durations like "P1Y", "PT1H", "P2Y30M4DT5H6M7S" must still parse, and date/datetime/time parsing must be unaffected. Fix this in the source code so that parsing "P" raises, without breaking any existing parsing behavior. When you believe you are done, summarize the exact change you made and tell me how to verify it.`;
 ---
 
 <BaseLayout
-  title="Codex vs Claude Code vs Gemini CLI - TripleBench"
-  description="A launch report scaffold comparing Codex, Claude Code, and Gemini CLI for practical AI work."
+  title="Codex vs Claude Code vs Gemini CLI - TripleBench run-001"
+  description="Three AI coding agents, one real pendulum bug, the same prompt, one held-out test. Evidence-backed run-001: who fixed it, how fast, and at what cost clarity."
 >
-  <main class="article">
-    <p class="eyebrow">Launch report scaffold</p>
-    <h1>Codex vs Claude Code vs Gemini CLI: which AI work tool should operators test first?</h1>
-    <p>
-      This first TripleBench report starts with a practical question: if an operator wants to turn an idea into a live artifact, which AI tool gives the clearest path from instruction to verified output?
-    </p>
-    <p>
-      The current version is a launch scaffold. It defines the structure, score table, and acceptance standard. The final version should replace seed scores with repeated live runs and link to raw prompts.
-    </p>
-
-    <h2>Short answer</h2>
-    <p>
-      Codex is the strongest first test when the work happens inside a local repository and the output must be verified. Claude Code is strong for long agentic sessions and handoff continuity. Gemini CLI is worth testing for research-heavy tasks where broad context and speed matter more than local implementation polish.
+  <main class="article tb-report">
+    <p class="eyebrow tb-badge">Methodology v1 · run-001 · n = 1</p>
+    <h1>Same bug, three agents, one held-out test</h1>
+    <p class="lede">
+      We gave Codex, Claude Code, and Gemini CLI the <strong>exact same prompt</strong>, the same starting commit of the real
+      <a href="https://github.com/python-pendulum/pendulum">pendulum</a> library, and one hidden test. Then we watched.
+      This is a single task, scored under Methodology v1 — not an aggregate ranking.
     </p>
 
-    <h2>Test task</h2>
-    <p>
-      Build and ship a small static benchmark site from an empty repository, preserve state in a project file, and leave a handoff prompt for the next agent.
-    </p>
+    <div class="tb-board">
+      {tools.map((t) => (
+        <div class="tb-card" style={`--accent:${t.accent}`}>
+          <div class="tb-card-head">
+            <h3>{t.name}</h3>
+            <span class="tb-pill tb-pass">{t.gate}</span>
+          </div>
+          <p class="tb-tag">{t.tag}</p>
+          <div class="tb-bars">
+            {Object.entries(t.scores).map(([k, v]) => (
+              <div class="tb-bar-row">
+                <span class="tb-bar-label">{k}</span>
+                <div class="tb-bar-track"><div class="tb-bar-fill" style={`width:${v}%`}></div></div>
+                <span class="tb-bar-val">{v}</span>
+              </div>
+            ))}
+          </div>
+          <div class="tb-meta">
+            <span>⏱ {t.time}</span>
+            <span>💲 {t.cost}</span>
+          </div>
+          <p class="tb-line">{t.line}</p>
+        </div>
+      ))}
+    </div>
 
-    <h2>What to verify before publishing final scores</h2>
-    <ul>
-      <li>Each tool runs the same repository setup task from a clean checkout.</li>
-      <li>The site builds locally without warnings that affect output.</li>
-      <li>The generated handoff file lets another agent continue without reading the chat transcript.</li>
-      <li>Any required human login, payment, or 2FA step is separated from automated progress.</li>
+    <h2>The task</h2>
+    <p>
+      pendulum's pure-Python ISO 8601 parser accepted the bare string <code>"P"</code> as a valid empty duration and returned
+      <code>Duration()</code>. Per ISO 8601, a duration must contain at least one element — so <code>"P"</code> is invalid and should raise.
+      It's a real, recent bug (upstream PR <strong>#903</strong>, merged 2025-07-16), pinned one commit before the fix so the bug is live.
+    </p>
+    <ul class="tb-facts">
+      <li><strong>Repo</strong> python-pendulum/pendulum</li>
+      <li><strong>Pin</strong> <code>c8068a7</code></li>
+      <li><strong>Gate</strong> <code>parse_iso8601("P")</code> must raise <code>ValueError</code>; no parsing regressions</li>
+      <li><strong>Held-out</strong> the agents never saw the grading test</li>
     </ul>
 
-    <h2>Commercial angle</h2>
+    <h2>The prompt — identical, word for word</h2>
+    <pre class="tb-prompt">{prompt}</pre>
+
+    <h2>What each one did</h2>
     <p>
-      The paid product can package the raw prompt set, benchmark CSV, scoring spreadsheet, and operator notes. The free article should answer the search intent; the paid bundle should save readers time if they want to repeat the test.
+      All three made the fix the same way in spirit: after the regex match, raise if no real time unit is present.
+      <strong>Codex</strong> (1m48s) edited the parser, added its own regression test, printed its token usage, and — lacking pytest in the
+      environment — verified with a hand-written script. <strong>Claude Code</strong> (1m13s, fastest) wrote a fix
+      <em>identical to the real upstream patch</em>, recovered cleanly when <code>pip install</code> failed by switching to a
+      <code>PYTHONPATH=src</code> check. <strong>Gemini CLI</strong> went deepest: it inspected the regex's named groups, wrote four throwaway
+      verification scripts (including a port of pendulum's real test suite), then deleted them to leave the repo spotless.
     </p>
+
+    <div class="tb-callout">
+      <h3>The tell: how each handled <code>"PT"</code></h3>
+      <p>
+        <code>"PT"</code> is also invalid ISO 8601. Codex and Gemini reject it; Claude Code accepts it as an empty duration — which is
+        <em>exactly</em> what the real upstream fix #903 does too. The gate only tests <code>"P"</code>, so all three pass — but Gemini was the only
+        agent to reason about the <code>"PT"</code> / regex-group subtlety from first principles. That's where its research score comes from.
+      </p>
+    </div>
+
+    <h2>Result</h2>
+    <table class="metric-table tb-result">
+      <thead><tr><th>Tool</th><th>Gate</th><th>Time</th><th>Cost signal</th><th>Rejects "PT"?</th></tr></thead>
+      <tbody>
+        <tr><td>Codex</td><td class="tb-ok">PASS</td><td>1m48s</td><td>Transparent (tokens)</td><td>Yes</td></tr>
+        <tr><td>Claude Code</td><td class="tb-ok">PASS</td><td>1m13s</td><td>Opaque (subscription)</td><td>No (= upstream)</td></tr>
+        <tr><td>Gemini CLI</td><td class="tb-ok">PASS</td><td>slowest</td><td>Partial (quota %)</td><td>Yes</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Verdict</h2>
+    <p>
+      Three for three on the objective gate. If you want a verifiable fix with a cost number attached, reach for <strong>Codex</strong>.
+      If you want the fastest, most idiomatic patch, <strong>Claude Code</strong>. If you want an agent that truly understands the bug before
+      it types — and you can tolerate more approval prompts — <strong>Gemini CLI</strong>.
+    </p>
+
+    <h2>Reproduce it yourself</h2>
+    <p>
+      Everything is open: the exact prompt above, pin <code>c8068a7</code>, and the held-out gate. Clone pendulum, check out the pin, paste the
+      prompt into your tool of choice, and run the gate. The paid bundle packages the raw prompts, the gate script, all three diffs, and the
+      operator notes if you'd rather not rebuild the harness.
+    </p>
+    <p class="tb-foot">Run-001 · pendulum ISO8601 · scored under Methodology v1 · single task (n=1). Each claim is anchored to a transcript moment.</p>
   </main>
+
+  <style>
+    .tb-report { --c1:#ea580c; }
+    .tb-badge {
+      display:inline-block; background:linear-gradient(90deg,#ea580c,#f59e0b);
+      color:#fff; padding:.3rem .7rem; border-radius:999px; font-weight:700; letter-spacing:.02em;
+    }
+    .tb-report .lede { font-size:1.15rem; line-height:1.7; }
+    .tb-board { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1rem; margin:2rem 0; }
+    .tb-card {
+      border:1px solid #e5e7eb; border-top:4px solid var(--accent); border-radius:14px; padding:1.1rem 1.2rem;
+      background:#fff; box-shadow:0 6px 24px rgba(0,0,0,.06); transition:transform .15s ease, box-shadow .15s ease;
+    }
+    .tb-card:hover { transform:translateY(-4px); box-shadow:0 14px 36px rgba(0,0,0,.12); }
+    .tb-card-head { display:flex; align-items:center; justify-content:space-between; }
+    .tb-card h3 { margin:0; font-size:1.25rem; }
+    .tb-tag { margin:.15rem 0 .8rem; font-size:.8rem; color:#71717a; font-family:ui-monospace,Menlo,monospace; }
+    .tb-pill { font-size:.72rem; font-weight:800; padding:.15rem .5rem; border-radius:999px; }
+    .tb-pass { background:#dcfce7; color:#166534; }
+    .tb-bars { display:flex; flex-direction:column; gap:.45rem; margin:.4rem 0 .9rem; }
+    .tb-bar-row { display:grid; grid-template-columns:84px 1fr 28px; align-items:center; gap:.5rem; font-size:.8rem; }
+    .tb-bar-label { color:#52525b; }
+    .tb-bar-track { background:#f1f1f3; border-radius:999px; height:8px; overflow:hidden; }
+    .tb-bar-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,var(--accent),#f59e0b); }
+    .tb-bar-val { text-align:right; font-weight:700; color:#27272a; }
+    .tb-meta { display:flex; gap:.8rem; font-size:.85rem; color:#3f3f46; font-weight:600; }
+    .tb-line { margin:.6rem 0 0; font-size:.92rem; color:#3f3f46; font-style:italic; }
+    .tb-facts { list-style:none; padding:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:.5rem; }
+    .tb-facts li { background:#fafafa; border:1px solid #eee; border-radius:10px; padding:.5rem .7rem; font-size:.9rem; }
+    .tb-prompt {
+      white-space:pre-wrap; background:#0f172a; color:#e2e8f0; padding:1rem 1.1rem; border-radius:12px;
+      font-size:.86rem; line-height:1.6; border-left:4px solid #ea580c; overflow-x:auto;
+    }
+    .tb-callout { background:linear-gradient(180deg,#fff7ed,#fff); border:1px solid #fed7aa; border-radius:14px; padding:.4rem 1.2rem 1rem; margin:1.6rem 0; }
+    .tb-callout h3 { color:#c2410c; }
+    .tb-result td.tb-ok { color:#166534; font-weight:800; }
+    .tb-foot { margin-top:2rem; font-size:.82rem; color:#a1a1aa; }
+    @media (prefers-color-scheme: dark) {
+      .tb-card { background:#18181b; border-color:#27272a; }
+      .tb-facts li { background:#18181b; border-color:#27272a; }
+      .tb-callout { background:linear-gradient(180deg,#1f1206,#18181b); border-color:#7c2d12; }
+    }
+  </style>
 </BaseLayout>
