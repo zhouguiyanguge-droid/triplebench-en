@@ -1,0 +1,138 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const blockers = [
+  {
+    n: "01",
+    accent: "#dc2626",
+    title: "Footage can't pass the realism bar",
+    body: "We want the rough realism of convenience-store CCTV / phone candid — cold fluorescent light, compression noise, vertical handheld shake. Image-to-video keeps coming out either too \"AI showreel / ad studio,\" or with an unstable face. Photoreal believability never clears our own ≥ 7.5 line; character consistency drifts across shots.",
+  },
+  {
+    n: "02",
+    accent: "#6d28d9",
+    title: "The agent fell into over-engineering paralysis",
+    body: "Because the gate is stuck on \"assets not landed,\" the collaborating agent's only daily move is read-only inspection plus writing reflections: watchlist → delta → streak → trend → scaffold → sync, looping. So it keeps building more tools — landing watchers, cross-day trend summaries, a path-regression verifier, endless readiness re-checkers. Every step locally reasonable; the sum is a treadmill.",
+  },
+];
+const questions = [
+  "How do you reliably get \"CCTV / found-footage realism\" out of image-to-video? Prompting, wrong model, or post-process noise/degrade/shake?",
+  "Character consistency across 16 shots in 2026 — is Kling's character reference enough, or train a LoRA / use something else?",
+  "The one we most want answered: when you run long-horizon tasks with Codex / Claude Code / Cursor, how do you stop the agent from over-engineering — building process instead of shipping?",
+];
+---
+
+<BaseLayout
+  title="Help wanted: an AI short-film pipeline stuck for 20 days - TripleBench"
+  description="We built an AI faux-documentary pipeline with Codex + Claude Code. The framework is solid, but it's been stuck ~20 days: footage can't pass a realism bar, and the agent over-engineered 437 scripts without shipping a single clip. An open build log and a request for advice."
+>
+  <main class="article tb-report">
+    <p class="eyebrow tb-badge">Open build log · help wanted</p>
+    <h1>We built an AI short-film pipeline with Codex + Claude Code — and it's been stuck for ~20 days</h1>
+    <p class="lede">
+      This is a request for advice, not a tutorial. Real project, real blockers, real numbers — all public.
+      If you actually know image-to-video realism or long-horizon agent workflows, we'd love to be wrong.
+    </p>
+
+    <div class="tb-hero">
+      <div class="tb-hero-cell tb-bad">
+        <div class="tb-big">437</div>
+        <div class="tb-cap">Python scripts the agent built</div>
+      </div>
+      <div class="tb-hero-vs">vs</div>
+      <div class="tb-hero-cell">
+        <div class="tb-big">0</div>
+        <div class="tb-cap">finished films shipped</div>
+      </div>
+    </div>
+    <p class="tb-hero-note">20 days, stuck in the same place. This time the one in the pit is us.</p>
+
+    <h2>What we're building</h2>
+    <p>
+      An (aspirationally) automated pipeline for faux-documentary shorts. First film: <em>"2:17 AM — there's an employee in
+      my store who doesn't exist."</em> Through CCTV, shaky phone clips and chat logs, a tiny convenience-store owner discovers
+      a fictional AI employee, "Xia," who's been replying to bad reviews and re-cutting his short videos at night. Original
+      virtual character — no real faces, no face-swap. Spec: 110–130s, 9:16, sixteen 5–9s shots, a new beat every 8–12s, hook in the first 3 seconds.
+    </p>
+
+    <h2>The framework (this part is honestly solid)</h2>
+    <p>Built by <strong>Codex + Claude Code</strong> working together, in stages:</p>
+    <pre class="tb-flow">script → shotlist + gen-prompts → character lookbook → image-to-video (16 shots) → audio → edit → platform test</pre>
+    <ul class="tb-facts">
+      <li><strong>Kling</strong> — character consistency, lip-sync, multi-shot</li>
+      <li><strong>Runway Gen-4</strong> — realistic motion, phone/CCTV texture</li>
+      <li><strong>HyperFrames / Remotion</strong> — captions, UI evidence, compositing</li>
+      <li><strong>Homegrown Python</strong> — asset acceptance, readiness gates, external-model review loop</li>
+    </ul>
+    <p>
+      We even gave it <strong>hard acceptance gates</strong> to stop self-deception: a <code>pipeline:gate</code> that only renders when
+      <code>render_allowed=true</code>; a rubric we send to Grok/Gemini/Claude (first-3s hold, event-driven, believability…) where
+      <code>overall &lt; 7.6</code> can't go to platform test; and a rule that "technically valid ≠ content valid." That process
+      discipline is, frankly, stricter than most people doing AI video.
+    </p>
+
+    <h2>Then we got stuck — on two levels</h2>
+    <div class="tb-board">
+      {blockers.map((b) => (
+        <div class="tb-card" style={`--accent:${b.accent}`}>
+          <div class="tb-card-head"><span class="tb-num">{b.n}</span><h3>{b.title}</h3></div>
+          <p>{b.body}</p>
+        </div>
+      ))}
+    </div>
+    <div class="tb-callout">
+      <h3>The number that says it all</h3>
+      <p>Our video pipeline has not produced a single finished clip yet — and <code>tools/</code> already holds <strong>437 Python scripts</strong>. The agent is extremely good at making the process more airtight. So airtight it forgot the goal was to ship a film.</p>
+    </div>
+
+    <h2>Questions for anyone who actually knows</h2>
+    <ol class="tb-q">
+      {questions.map((q) => (<li>{q}</li>))}
+    </ol>
+
+    <h2>What we've already tried (not lazy)</h2>
+    <ul>
+      <li>Heavy negative prompts to kill the "AI look" (cartoon / sci-fi / beauty filter / distorted face…)</li>
+      <li>An external-model review loop with a quantified rubric and hard thresholds</li>
+      <li>Decomposing into "stills first → then i2v → one action per shot" to reduce complexity</li>
+      <li>Adding fail-close gates to the agent — which is exactly what <em>fed</em> the over-engineering problem</li>
+    </ul>
+
+    <h2>Reach out</h2>
+    <p>
+      Full pre-production pack, shot prompts, the review rubric, and the structure of those 437 scripts — open to anyone who
+      wants a real exchange. This is a genuine episode of "AI tools, the hard way" — except this time the one who fell in the pit is us.
+    </p>
+    <p class="tb-foot">Open build log · published as-is · we will update this page when we get unstuck.</p>
+  </main>
+
+  <style>
+    .tb-badge { display:inline-block; background:linear-gradient(90deg,#ea580c,#f59e0b); color:#fff; padding:.3rem .7rem; border-radius:999px; font-weight:700; }
+    .tb-report .lede { font-size:1.15rem; line-height:1.7; }
+    .tb-hero { display:flex; align-items:center; justify-content:center; gap:1.5rem; margin:2rem 0 .5rem; }
+    .tb-hero-cell { flex:1; max-width:240px; border:3px solid #d4d4d8; border-radius:16px; padding:1.4rem 1rem; text-align:center; }
+    .tb-hero-cell.tb-bad { border-color:#dc2626; }
+    .tb-big { font-size:5rem; font-weight:800; line-height:1; color:#27272a; }
+    .tb-bad .tb-big { color:#dc2626; }
+    .tb-cap { margin-top:.5rem; font-size:.95rem; color:#52525b; }
+    .tb-hero-vs { font-size:1.5rem; font-weight:700; color:#a1a1aa; }
+    .tb-hero-note { text-align:center; color:#71717a; font-style:italic; margin-top:0; }
+    .tb-flow { background:#0f172a; color:#e2e8f0; padding:1rem 1.1rem; border-radius:12px; border-left:4px solid #ea580c; overflow-x:auto; font-size:.9rem; }
+    .tb-facts { list-style:none; padding:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:.5rem; }
+    .tb-facts li { background:#fafafa; border:1px solid #eee; border-radius:10px; padding:.55rem .8rem; font-size:.92rem; }
+    .tb-board { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1rem; margin:1.5rem 0; }
+    .tb-card { border:1px solid #e5e7eb; border-top:4px solid var(--accent); border-radius:14px; padding:1.1rem 1.2rem; background:#fff; box-shadow:0 6px 24px rgba(0,0,0,.06); }
+    .tb-card-head { display:flex; align-items:baseline; gap:.6rem; }
+    .tb-num { font-weight:800; color:var(--accent); font-size:1.1rem; }
+    .tb-card h3 { margin:.2rem 0 .5rem; font-size:1.15rem; }
+    .tb-callout { background:linear-gradient(180deg,#fff7ed,#fff); border:1px solid #fed7aa; border-radius:14px; padding:.4rem 1.2rem 1rem; margin:1.6rem 0; }
+    .tb-callout h3 { color:#c2410c; }
+    .tb-q { line-height:1.7; }
+    .tb-q li { margin-bottom:.6rem; }
+    .tb-foot { margin-top:2rem; font-size:.82rem; color:#a1a1aa; }
+    @media (prefers-color-scheme: dark) {
+      .tb-card, .tb-facts li { background:#18181b; border-color:#27272a; }
+      .tb-callout { background:linear-gradient(180deg,#1f1206,#18181b); border-color:#7c2d12; }
+    }
+  </style>
+</BaseLayout>
