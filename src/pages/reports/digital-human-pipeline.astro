@@ -1,0 +1,125 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const stages = [
+  {
+    n: "1",
+    accent: "#ea580c",
+    title: "Script / topic",
+    pick: "LLM batch scripting (Claude / GPT / Gemini)",
+    cand: "Hook templates, trending-topic mining. We want event-driven, not a PPT read-aloud.",
+  },
+  {
+    n: "2",
+    accent: "#6d28d9",
+    title: "Avatar / lip-sync",
+    pick: "HeyGen / Synthesia (stable) · Hedra (lip-sync rated 9/10) · D-ID (cheapest API)",
+    cand: "Kling 3.0 (anatomically consistent), DeepBrain, Colossyan (generous free tier), Elai (clone yourself). Blocker: non-English lip-sync + identity stability + no plastic look.",
+  },
+  {
+    n: "3",
+    accent: "#2563eb",
+    title: "Voice / TTS / cloning",
+    pick: "Commercial: ElevenLabs; Open-source: Coqui XTTS v2 (multilingual, local)",
+    cand: "Resemble, built-in TTS. Blocker: naturalness + emotion + alignment with lip-sync.",
+  },
+  {
+    n: "4",
+    accent: "#16a34a",
+    title: "B-roll / footage",
+    pick: "Image-to-video fill (Kling / Runway / Veo)",
+    cand: "Stock + screen capture + real footage mix. Blocker: visual consistency with the avatar.",
+  },
+  {
+    n: "5",
+    accent: "#dc2626",
+    title: "Edit / compose / captions",
+    pick: "Remotion (code-driven) / CapCut · auto-captions",
+    cand: "FFmpeg scripted batch. Blocker: pacing (a beat every 8–12s) + consistent caption style.",
+  },
+  {
+    n: "6",
+    accent: "#9333ea",
+    title: "Orchestration / automation",
+    pick: "n8n to chain it all (script → TTS → avatar → edit → publish)",
+    cand: "Homegrown Python pipeline + queue. Blocker: which stage must keep a human, which can go fully auto.",
+  },
+];
+const questions = [
+  "If the goal is fully-automated, daily-publishable, multi-language, platform-passing — what would you pick for each of the 6 stages? Which combo has the best ROI?",
+  "Lip-sync + voice emotion in 2026: is HeyGen good enough for non-English, or is Kling/Hedra + ElevenLabs better?",
+  "Which stages MUST keep a human gate (or quality collapses), and which can safely go fully auto?",
+  "How do you keep cost down? Per-clip SaaS billing vs open-source self-host (XTTS / local models) — where's the break-even?",
+];
+---
+
+<BaseLayout
+  title="Help wanted: the perfect tool stack for a fully-automated AI digital-human video pipeline - TripleBench"
+  description="We broke the digital-human short-video pipeline into 6 stages, listed the 2026 tool candidates and our leanings for each, then asked the people who've actually shipped a fully-automated avatar line to weigh in."
+>
+  <main class="article tb-report">
+    <p class="eyebrow tb-badge">Open question · tool selection</p>
+    <h1>What's the perfect tool stack for a fully-automated AI digital-human video pipeline?</h1>
+    <p class="lede">
+      We broke the pipeline into 6 stages and listed the 2026 candidates plus our current leanings for each.
+      This isn't "tell us what to use" — it's putting our thinking on the table for people who've actually shipped a fully-automated avatar line. Goal: <strong>fully automated, daily-publishable, multilingual, platform-passing</strong>.
+    </p>
+
+    <h2>6 stages · candidates & leanings</h2>
+    <div class="tb-board">
+      {stages.map((s) => (
+        <div class="tb-card" style={`--accent:${s.accent}`}>
+          <div class="tb-card-head"><span class="tb-num">{s.n}</span><h3>{s.title}</h3></div>
+          <p class="tb-pick"><strong>Leaning:</strong> {s.pick}</p>
+          <p class="tb-cand">{s.cand}</p>
+        </div>
+      ))}
+    </div>
+
+    <div class="tb-callout">
+      <h3>Why ask in the open</h3>
+      <p>This space has too many tools changing too fast — single-tool reviews don't help. The hard part is <strong>the combination</strong>: which few pieces actually chain end-to-end, cheaply, at daily cadence. We'd rather show our reasoning and get corrected than burn money trial-and-erroring in private.</p>
+    </div>
+
+    <h2>4 questions for people who've shipped</h2>
+    <ol class="tb-q">
+      {questions.map((q) => (<li>{q}</li>))}
+    </ol>
+
+    <h2>Our constraints</h2>
+    <ul>
+      <li>Primarily Chinese content; target platforms include Douyin / Xiaohongshu / WeChat Channels / YouTube Shorts</li>
+      <li>Must support daily cadence — so per-clip cost and human intervention should be as low as possible</li>
+      <li>No real faces, no face-swap; the avatar is an original virtual character</li>
+      <li>We have local compute (NAS / own machines) — open-source self-host is on the table, not just SaaS</li>
+    </ul>
+
+    <h2>How to respond</h2>
+    <p>
+      If you've actually shipped a fully-automated digital-human line — SaaS combo or open-source self-host — come tell us your stack.
+      We'll compile the responses into a public "digital-human pipeline selection" comparison, with attribution. This is the open selection clinic of "AI tools, the hard way."
+    </p>
+    <p class="tb-foot">Open question · stack updated over time · we'll fold working setups back into this page.</p>
+  </main>
+
+  <style>
+    .tb-badge { display:inline-block; background:linear-gradient(90deg,#ea580c,#f59e0b); color:#fff; padding:.3rem .7rem; border-radius:999px; font-weight:700; }
+    .tb-report .lede { font-size:1.15rem; line-height:1.7; }
+    .tb-board { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1rem; margin:1.5rem 0; }
+    .tb-card { border:1px solid #e5e7eb; border-top:4px solid var(--accent); border-radius:14px; padding:1.1rem 1.2rem; background:#fff; box-shadow:0 6px 24px rgba(0,0,0,.06); }
+    .tb-card-head { display:flex; align-items:baseline; gap:.6rem; }
+    .tb-num { font-weight:800; color:var(--accent); font-size:1.3rem; }
+    .tb-card h3 { margin:.2rem 0 .5rem; font-size:1.2rem; }
+    .tb-pick { font-size:.95rem; margin:.3rem 0; }
+    .tb-cand { font-size:.9rem; color:#52525b; margin:.3rem 0 0; }
+    .tb-callout { background:linear-gradient(180deg,#fff7ed,#fff); border:1px solid #fed7aa; border-radius:14px; padding:.4rem 1.2rem 1rem; margin:1.6rem 0; }
+    .tb-callout h3 { color:#c2410c; }
+    .tb-q { line-height:1.7; }
+    .tb-q li { margin-bottom:.6rem; }
+    .tb-foot { margin-top:2rem; font-size:.82rem; color:#a1a1aa; }
+    @media (prefers-color-scheme: dark) {
+      .tb-card { background:#18181b; border-color:#27272a; }
+      .tb-callout { background:linear-gradient(180deg,#1f1206,#18181b); border-color:#7c2d12; }
+    }
+  </style>
+</BaseLayout>
