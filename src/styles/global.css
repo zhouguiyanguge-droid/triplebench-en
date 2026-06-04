@@ -267,7 +267,10 @@ p {
 }
 
 .article h1 {
-  font-size: clamp(2.1rem, 5vw, 4.8rem);
+  font-size: clamp(1.9rem, 3.4vw, 3rem);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  margin-bottom: 6px;
 }
 
 .article h2 {
