@@ -3,14 +3,17 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://triplebench.com/</loc>
-    <lastmod>2026-05-29T07:40:02+00:00</lastmod>
+    <lastmod>2026-06-06T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://triplebench.com/"/>
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://sanmoshice.com/"/>
   </url>
-  <url><loc>https://triplebench.com/manifesto/</loc><lastmod>2026-05-29T07:40:02+00:00</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://triplebench.com/methodology/</loc><lastmod>2026-05-29T07:40:02+00:00</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://triplebench.com/benchmarks/</loc><lastmod>2026-05-29T07:40:02+00:00</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://triplebench.com/reports/codex-claude-gemini/</loc><lastmod>2026-05-29T07:40:02+00:00</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://triplebench.com/reports/</loc><lastmod>2026-06-06T00:00:00+00:00</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://triplebench.com/reports/digital-human-pipeline/</loc><lastmod>2026-06-06T00:00:00+00:00</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://triplebench.com/reports/ai-video-pipeline/</loc><lastmod>2026-06-06T00:00:00+00:00</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://triplebench.com/reports/codex-vs-claude-vs-gemini/</loc><lastmod>2026-06-06T00:00:00+00:00</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://triplebench.com/methodology/</loc><lastmod>2026-06-06T00:00:00+00:00</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://triplebench.com/manifesto/</loc><lastmod>2026-06-06T00:00:00+00:00</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://triplebench.com/benchmarks/</loc><lastmod>2026-06-06T00:00:00+00:00</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
 </urlset>
