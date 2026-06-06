@@ -36,14 +36,14 @@ const agents = [
 ---
 
 <BaseLayout
-  title="All three AIs said 'fixed' — I'd only merge one - TripleBench run-002"
+  title="Same invisible .env bug, three AI fixes — diff hygiene decided it - TripleBench run-002"
   description="An invisible character silently breaks your .env config. Codex, Claude Code and Gemini CLI fix the same real python-dotenv bug against a hidden gate. Full diff evidence."
   ogType="article"
   publishedDate="2026-06-06"
 >
   <main class="article tb-report">
     <p class="eyebrow tb-badge">Pitfall Lab · run-002 · n = 1</p>
-    <h1>All three AIs said "fixed" — I'd only merge one without looking</h1>
+    <h1>Same invisible .env bug, three AI fixes — diff hygiene decided it</h1>
     <p class="lede">
       This bug has probably bitten you without you knowing: an <strong>invisible character</strong> in a config file.
       No error, no crash — your app just can't read your config. We had Codex, Claude Code and Gemini CLI fix it
@@ -54,13 +54,13 @@ const agents = [
       <h2>The bug, in plain words</h2>
       <p>
         Ever edited a <code>.env</code> file in Windows Notepad? On save it may silently prepend 3 bytes —
-        a marker called a <strong>BOM</strong>. Completely invisible. But when your app reads the config,
+        a marker called a <strong>BOM</strong> — think of it as an encoding hint some editors write at the start of a file. Completely invisible. But when your app reads the config,
         the first variable name becomes <code>\ufeffAPI_KEY</code> — that <code>\ufeff</code> prefix is the invisible character instead of <code>API_KEY</code>.
       </p>
-      <p class="tb-punch">Result: no error, no crash, and your app just cannot find API_KEY. This kind of thing eats a junior dev's whole day.</p>
+      <p class="tb-punch">Result: no error, no crash, and your app just cannot find API_KEY. This kind of issue can burn hours because nothing looks obviously broken.</p>
       <div class="tb-bytes" aria-label="bytes at the start of the file">
         <span class="tb-byte tb-byte-bad">EF</span><span class="tb-byte tb-byte-bad">BB</span><span class="tb-byte tb-byte-bad">BF</span><span class="tb-byte">46 'F'</span><span class="tb-byte">49 'I'</span><span class="tb-byte">52 'R'</span><span class="tb-byte">53 'S'</span><span class="tb-byte">54 'T'</span><span class="tb-byte">3D '='</span><span class="tb-byte">…</span>
-        <p class="tb-bytes-cap">The three red bytes are the BOM — invisible in your editor. This is a real bug in <a href="https://github.com/theskumar/python-dotenv">python-dotenv</a>, Python's standard config loader (<a href="https://github.com/theskumar/python-dotenv/pull/640">upstream PR #640</a>).</p>
+        <p class="tb-bytes-cap">The three red bytes are the BOM — invisible in your editor. This is a real bug in <a href="https://github.com/theskumar/python-dotenv">python-dotenv</a>, a widely used third-party config loader for Python (<a href="https://github.com/theskumar/python-dotenv/pull/640">upstream PR #640</a>).</p>
       </div>
     </section>
 
@@ -69,12 +69,13 @@ const agents = [
       <div class="tb-setup">
         <div class="tb-setup-item"><span class="tb-num">1</span><p><strong>Same starting point</strong><br/>pinned to the commit before the official fix<br/><code>fa4e6a90</code></p></div>
         <div class="tb-setup-item"><span class="tb-num">2</span><p><strong>Same prompt</strong><br/>all three got the identical task, word for word</p></div>
-        <div class="tb-setup-item"><span class="tb-num">3</span><p><strong>Hidden gate</strong><br/>3 private test cases they never saw, revealed only after they finished</p></div>
+        <div class="tb-setup-item"><span class="tb-num">3</span><p><strong>Hidden gate</strong><br/>5 hidden checks they never saw, revealed only after they finished</p></div>
       </div>
     </section>
 
     <section>
       <h2>Scoreboard</h2>
+      <p class="tb-foot">The scoreboard below describes only this one task, not the tools' overall capability.</p>
       <div class="tb-board">
         {agents.map((a) => (
           <div class="tb-card" style={`--accent:${a.accent}`}>
@@ -104,7 +105,7 @@ const agents = [
 <span class="tb-add">+           self.string = self.string[1:]</span>
 <span class="tb-ctx">        self.position = Position.start()</span></code></pre>
       <p>
-        <strong>So where's the difference? In the parts you don't see.</strong>
+        <strong>What actually separated them was the exit work in the diff.</strong>
         Claude Code slotted its regression test into the existing test table with a comment. Codex tested at the API layer
         and cleaned up its temp files. Gemini wrote the broadest new test file — and accidentally committed an unrelated
         <code>uv.lock</code> along with it.
@@ -114,7 +115,7 @@ const agents = [
           <thead><tr><th>Exit checklist</th><th style="color:#ea580c">Codex</th><th style="color:#6d28d9">Claude Code</th><th style="color:#2563eb">Gemini CLI</th></tr></thead>
           <tbody>
             <tr><td>Core fix correct</td><td>✅</td><td>✅</td><td>✅</td></tr>
-            <tr><td>Regression test included</td><td>✅</td><td>✅</td><td>✅✅ broadest</td></tr>
+            <tr><td>Regression test included</td><td>✅</td><td>✅</td><td>✅ 3 entry points</td></tr>
             <tr><td>Diff contains only related changes</td><td>✅</td><td>✅</td><td>⚠️ stray uv.lock</td></tr>
             <tr><td>No formatting noise</td><td>✅</td><td>✅</td><td>⚠️ trailing whitespace</td></tr>
             <tr><td>Temp files cleaned up</td><td>✅ deleted proactively</td><td>— (none created)</td><td>❌ left behind</td></tr>
@@ -125,12 +126,14 @@ const agents = [
 
     <section>
       <h2>What the hidden gate checked</h2>
+      <p>After the run, we applied 5 hidden checks. Here are the 3 BOM behavior cases that are easiest to read:</p>
       <ol class="tb-gate">
         <li><strong>BOM + single key</strong> — must parse a clean <code>FIRST</code>; a key with the invisible prefix is an instant fail</li>
         <li><strong>BOM + multiple keys</strong> — keys after line one must be unaffected</li>
         <li><strong>No BOM at all</strong> — guards against over-fixing normal behavior</li>
       </ol>
-      <p class="tb-punch">All three passed. No disaster story this round — and that's exactly why cleanliness became the real differentiator.</p>
+      <p>The other two checks were <strong>Unicode value preservation</strong> and the <strong>parser test suite</strong> — guarding against a fix that strips legitimate Unicode or regresses existing parsing behavior.</p>
+      <p class="tb-punch">All three passed all five. No disaster story this round — and that's exactly why cleanliness became the real differentiator.</p>
     </section>
 
     <section class="tb-verdict">
@@ -139,7 +142,7 @@ const agents = [
       <p>
         All three got the job done. Whether the result was <em>clean</em> is what decides if you'd merge it without
         reading every line. If you remember one thing: <strong>after an AI says "fixed", check its diff for files
-        that have no business being there.</strong> Cheapest code review you'll ever do.
+        that have no business being there.</strong> A ten-second look at the diff is usually cheaper than a rollback.
       </p>
     </section>
 
